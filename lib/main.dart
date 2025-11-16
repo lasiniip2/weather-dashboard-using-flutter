@@ -60,8 +60,211 @@ class MyApp extends StatelessWidget {
           hintStyle: const TextStyle(color: Color(0xFF374151)),
         ),
       ),
-      home: const WeatherDashboard(),
+      home: const WelcomePage(),
       debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+// Welcome Page
+class WelcomePage extends StatelessWidget {
+  const WelcomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF030712),
+              Color(0xFF0A1628),
+              Color(0xFF1E3A8A),
+              Color(0xFF0A1628),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Weather Icon
+                  Container(
+                    padding: const EdgeInsets.all(30),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [
+                          const Color(0xFF3B82F6).withOpacity(0.3),
+                          const Color(0xFF1E40AF).withOpacity(0.3),
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF3B82F6).withOpacity(0.3),
+                          blurRadius: 30,
+                          spreadRadius: 10,
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.cloud_outlined,
+                      size: 100,
+                      color: Color(0xFF60A5FA),
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+
+                  // Title
+                  const Text(
+                    'Weather Dashboard',
+                    style: TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 1,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Subtitle
+                  Text(
+                    'Get real-time weather updates\nbased on your student index',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white.withOpacity(0.7),
+                      height: 1.5,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 60),
+
+                  // Get Started Button
+                  Container(
+                    width: double.infinity,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF3B82F6), Color(0xFF1E40AF)],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF3B82F6).withOpacity(0.5),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) => const WeatherDashboard(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Get Started',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+
+                  // Info cards
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _InfoCard(
+                          icon: Icons.person_outline,
+                          text: 'Student\nIndex',
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _InfoCard(
+                          icon: Icons.location_on_outlined,
+                          text: 'Auto\nCoordinates',
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _InfoCard(
+                          icon: Icons.cloud_queue_outlined,
+                          text: 'Live\nWeather',
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _InfoCard extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const _InfoCard({required this.icon, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: const Color(0xFF60A5FA), size: 28),
+          const SizedBox(height: 8),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 11,
+              color: Colors.white.withOpacity(0.7),
+              height: 1.3,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -178,16 +381,27 @@ class _WeatherDashboardState extends State<WeatherDashboard> {
         setState(() {
           _isLoading = false;
           _errorMessage =
-              'Failed to fetch weather. Status: ${response.statusCode}';
+              'Unable to fetch weather data. Please try again later.';
         });
 
         // Try to load cached data
         await _loadCachedData();
       }
     } catch (e) {
+      String friendlyError;
+      if (e.toString().contains('SocketException') ||
+          e.toString().contains('Failed host lookup')) {
+        friendlyError = 'No internet connection. Please check your network.';
+      } else if (e.toString().contains('TimeoutException')) {
+        friendlyError = 'Request timeout. Please try again.';
+      } else {
+        friendlyError =
+            'Unable to connect to weather service. Please try again later.';
+      }
+
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Network error: ${e.toString()}';
+        _errorMessage = friendlyError;
       });
 
       // Try to load cached data
