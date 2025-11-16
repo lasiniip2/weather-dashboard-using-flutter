@@ -453,6 +453,14 @@ class _WeatherDashboardState extends State<WeatherDashboard> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const WelcomePage()),
+            );
+          },
+        ),
         title: const Text(
           'Weather Dashboard',
           style: TextStyle(
