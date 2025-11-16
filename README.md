@@ -1,4 +1,4 @@
-# Weather Dashboard - Student Index 224143T
+# Weather Dashboard Using Flutter
 
 A Flutter-based weather dashboard application that calculates geographical coordinates from a student index number and fetches real-time weather data.
 
